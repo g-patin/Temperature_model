@@ -11,7 +11,7 @@ from IPython.display import display, clear_output
 
 ####### DEFINE FUNCTION #######
 
-def T_model(n_rows, n_cols, R, L, k, C_p, rho, h, dt, T_inf, T_init, RS, power_density):
+def T_model(n_rows, n_cols, R, L, k, C_p, rho, h, dt, T_inf, T_init, RS, power,bs):
     """
     Function that models the diffusion of heat through a paint layer when exposed to a light source.
 
@@ -33,7 +33,7 @@ def T_model(n_rows, n_cols, R, L, k, C_p, rho, h, dt, T_inf, T_init, RS, power_d
     Thermal conductivity of the substrate (paint) (W/(m K))
 
     C_p: a float
-    Specific heat capacity of the substrate (paint) (W/(m^2 K))
+    Specific heat capacity of the substrate (paint) (J/(kg K))
 
     rho: a float
     Mass density of the substrate (paint) (kg/m^3)
@@ -56,13 +56,20 @@ def T_model(n_rows, n_cols, R, L, k, C_p, rho, h, dt, T_inf, T_init, RS, power_d
     power_density: a int
     Power density of the light source illuminating the surface (define unit !)
 
+    bs: a float
+    Influence the size of the fading beam. It corresponds precisely to the sigma coefficient attached to the gaussian filter of the fading beam data.
+
+    fwhm : a float
+    Full width at half maximum (microns)
+
     
     Returns
     ====================================================
-    
+    It returns a tuple (M,C) where M is an N x N matrix and C a constant term arising from Dirichlet boundary conditions.
     """
-    R = R/1000
-    L = L/1000
+
+    #R = R/1000
+    #L = L/1000
     #R = R * 1.e-6
     #L = L * 1.e-6
 
@@ -71,10 +78,17 @@ def T_model(n_rows, n_cols, R, L, k, C_p, rho, h, dt, T_inf, T_init, RS, power_d
     alpha = k / (rho * C_p)               # thermal diffusivity m^2/s
     N = n_rows * n_cols                   # number of degrees of freedom
 
+    res1 = R/ n_cols * 1e6
+    res2 = L/ n_rows * 1e6 
+
+    area = np.pi*((bs/ 1e6 )/2)**2        # area in m²
+    power_density = (power/1e3) / area
+    print(f'power density = {power_density} W/m²')
+
     s = np.zeros(n_cols*2)
     s[n_cols] = 1
-    s = ndimage.gaussian_filter(s, 100)
-    s /= s.max()
+    s = ndimage.gaussian_filter(s, (bs/res1)/2.355)
+    s /= s.max()    
     s *= power_density
 
     I = np.zeros(n_cols)                  # power density values (W/m^2) of the light source as a function of radius along the top

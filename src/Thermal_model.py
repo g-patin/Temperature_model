@@ -53,7 +53,7 @@ def T_model(n_rows, n_cols, R, L, k, C_p, rho, h, dt, T_inf, T_init, RS, power,b
     RS: a float
     Mean reflectance spectrum of the sample
     
-    power_density: a int
+    power: a int
     Power density of the light source illuminating the surface (define unit !)
 
     bs: a float
@@ -82,7 +82,7 @@ def T_model(n_rows, n_cols, R, L, k, C_p, rho, h, dt, T_inf, T_init, RS, power,b
     res2 = L/ n_rows * 1e6 
 
     area = np.pi*((bs/ 1e6 )/2)**2        # area in m²
-    power_density = (power/1e3) / area
+    power_density = int((power/1e3) / area)
     print(f'power density = {power_density} W/m²')
 
     s = np.zeros(n_cols*2)

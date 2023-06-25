@@ -133,12 +133,12 @@ RS = wg.FloatSlider(
         style=style,
     )
     
-power_density = wg.IntSlider(
+power = wg.FloatSlider(
         value = 5,
         min=0,
-        max=100000,
-        step=1000,
-        description="Power density",
+        max=100,
+        step=0.1,
+        description="Power (mW)",
         layout=Layout(width="50%", height="30px"),
         style=style,
     )
@@ -148,7 +148,7 @@ bs = wg.FloatSlider(
         min=0,
         max=2000,
         step=1,
-        description="Beam size",
+        description="Beam size (um)",
         layout=Layout(width="50%", height="30px"),
         style=style,
     )
@@ -159,7 +159,7 @@ run_button = wg.Button(description='Run simulation')
 
 class simulate(object):
     
-    #def __init__(self, n_rows,n_cols,R,L,k,C_p,rho,h,dt,T_inf,T_init,RS,power_density,bs):    
+    #def __init__(self, n_rows,n_cols,R,L,k,C_p,rho,h,dt,T_inf,T_init,RS,power,bs):    
     def __init__(self): 
       
         self.n_rows = n_rows.value
@@ -174,13 +174,13 @@ class simulate(object):
         self.T_inf = T_inf.value
         self.T_init = T_init.value
         self.RS = RS.value
-        self.power_density = power_density.value
+        self.power = power.value
         self.bs = bs.value
         self.run_button = run_button
         self.run_button.on_click(self.button_pressed)  
 
        
-        list_widgets = [wg.VBox([R,L,n_rows,n_cols,k,C_p,rho,h,dt,T_inf,T_init,RS,power_density,bs])]    
+        list_widgets = [wg.VBox([R,L,n_rows,n_cols,k,C_p,rho,h,dt,T_inf,T_init,RS,power,bs])]    
         accordion = wg.Accordion(children = list_widgets)
         accordion.set_title(0, 'Parameters')
 
@@ -194,8 +194,8 @@ class simulate(object):
     def params(self):
         
         simulate.update_params(self)
-        parameters = ['n_rows','n_cols','R','L','k','C_p','rho','h','dt','T_inf','T_init','RS','power_density','bs']
-        values = [self.n_rows,self.n_cols,self.R,self.L,self.k,self.C_p,self.rho,self.h,self.dt,self.T_inf,self.T_init,self.RS,self.power_density,self.bs]
+        parameters = ['n_rows','n_cols','R','L','k','C_p','rho','h','dt','T_inf','T_init','RS','power','bs']
+        values = [self.n_rows,self.n_cols,self.R,self.L,self.k,self.C_p,self.rho,self.h,self.dt,self.T_inf,self.T_init,self.RS,self.power,self.bs]
 
         df_params = pd.DataFrame([parameters,values], index=['parameter','value']).T
         df_params = df_params.set_index('parameter')
@@ -204,19 +204,19 @@ class simulate(object):
 
 
     def matrices_MC(self):
-        (M,C) = Thermal_model.T_model(self.n_rows,self.n_cols,self.R,self.L,self.k,self.C_p,self.rho,self.h,self.dt,self.T_inf,self.T_init,self.RS,self.power_density,self.bs)
+        (M,C) = Thermal_model.T_model(self.n_rows,self.n_cols,self.R,self.L,self.k,self.C_p,self.rho,self.h,self.dt,self.T_inf,self.T_init,self.RS,self.power,self.bs)
 
         return M,C
 
     def beam_intensity(self):
-        (M,C) = Thermal_model.T_model(self.n_rows,self.n_cols,self.R,self.L,self.k,self.C_p,self.rho,self.h,self.dt,self.T_inf,self.T_init,self.RS,self.power_density,self.bs)
+        (M,C) = Thermal_model.T_model(self.n_rows,self.n_cols,self.R,self.L,self.k,self.C_p,self.rho,self.h,self.dt,self.T_inf,self.T_init,self.RS,self.power,self.bs)
 
         #return I
 
 
     def T_mesh(self):
         simulate.update_params(self)
-        (M,C) = Thermal_model.T_model(self.n_rows,self.n_cols,self.R,self.L,self.k,self.C_p,self.rho,self.h,self.dt,self.T_inf,self.T_init,self.RS,self.power_density,self.bs)
+        (M,C) = Thermal_model.T_model(self.n_rows,self.n_cols,self.R,self.L,self.k,self.C_p,self.rho,self.h,self.dt,self.T_inf,self.T_init,self.RS,self.power,self.bs)
         
         r = np.linspace(0, self.R, self.n_cols + 1)  # radius values at cell boundaries
         r_half = (r[1:] + r[:-1]) / 2                # radius values at cell centers
@@ -284,8 +284,8 @@ class simulate(object):
         def file_change_T_inf(change):
             self.T_inf = change.new
 
-        def file_change_power_density(change):
-            self.power_density = change.new
+        def file_change_power(change):
+            self.power = change.new
 
         def file_change_dt(change):
             self.dt = change.new
@@ -305,7 +305,7 @@ class simulate(object):
         RS.observe(file_change_RS, names = 'value') 
         T_inf.observe(file_change_T_inf, names = 'value')
         T_init.observe(file_change_T_init, names = 'value') 
-        power_density.observe(file_change_power_density, names = 'value') 
+        power.observe(file_change_power, names = 'value') 
         dt.observe(file_change_dt, names = 'value') 
         bs.observe(file_change_bs, names = 'value') 
         
@@ -370,8 +370,8 @@ class simulate(object):
             
             #ax2.plot(T_mesh[:,0],x1, ls='--', label='Depth T')  
             
-            depth_T_values = np.round(T_mesh[:,0],2)
-            depth_T_min = list(depth_T_values >= T_mesh.min() + 0.1).index(False) * res2
+            #depth_T_values = np.round(T_mesh[:,0],2)
+            #depth_T_min = list(depth_T_values >= T_mesh.min() + 0.1).index(False) * res2
             ax6.annotate(f'max T = {np.round(T_mesh.max(),3)} C', (0.1, 0.9), fontsize = fs)
             ax6.annotate(f'min T = {np.round(T_mesh.min(),3)} C', (0.1, 0.8), fontsize = fs)
             #ax6.annotate(f'depth at which T = T_min +0.1 C is {depth_T_min} µm', (0.1, 0.7), fontsize = fs)

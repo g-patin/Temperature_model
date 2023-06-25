@@ -152,12 +152,12 @@ def T_model(folder=''):
         style=style,
     )
     
-    power_density = wg.IntSlider(
-        value = 60000,
+    power = wg.FloatSlider(
+        value = 5,
         min=0,
-        max=100000,
-        step=1000,
-        description="Power density",
+        max=100,
+        step=0.1,
+        description="Power (mW)",
         layout=Layout(width="50%", height="30px"),
         style=style,
     )
@@ -167,7 +167,7 @@ def T_model(folder=''):
         min=0,
         max=20,
         step=0.1,
-        description="Beam size",
+        description="Beam size (um)",
         layout=Layout(width="50%", height="30px"),
         style=style,
     )
@@ -175,7 +175,7 @@ def T_model(folder=''):
     
     output = wg.Output()
     
-    list_widgets = [wg.VBox([R,L,n_rows,n_cols,k,C_p,rho,dt,T_inf,T_init,RS,power_density,bs])]
+    list_widgets = [wg.VBox([R,L,n_rows,n_cols,k,C_p,rho,dt,T_inf,T_init,RS,power,bs])]
     
     accordion = wg.Accordion(children = list_widgets)
     accordion.set_title(0, 'Parameters')
@@ -190,9 +190,9 @@ def T_model(folder=''):
     
     
     
-    def plot_data(n_rows,n_cols,R,L,k,C_p,rho,h,dt,T_inf,T_init,RS,power_density,bs):
-        T = Temp_class.Temp(n_rows,n_cols,R,L,k,C_p,rho,h,dt,T_inf,T_init,RS,power_density,bs)
-        #(M,C) = Thermal_model.T_model(n_rows.value, n_cols.value, R.value, L.value, k.value, C_p.value, rho.value, h.value, dt.value, T_inf.value, T_init.value, RS.value, power_density.value)
+    def plot_data(n_rows,n_cols,R,L,k,C_p,rho,h,dt,T_inf,T_init,RS,power,bs):
+        T = Temp_class.Temp(n_rows,n_cols,R,L,k,C_p,rho,h,dt,T_inf,T_init,RS,power,bs)
+        #(M,C) = Thermal_model.T_model(n_rows.value, n_cols.value, R.value, L.value, k.value, C_p.value, rho.value, h.value, dt.value, T_inf.value, T_init.value, RS.value, power.value)
                       
         
         T_mesh = T.T_mesh()
@@ -262,75 +262,75 @@ def T_model(folder=''):
         output.clear_output(wait = True)
      
         with output:
-            plot_data(n_rows.value, n_cols.value, change.new, L.value, k.value, C_p.value, rho.value, h.value, dt.value, T_inf.value, T_init.value, RS.value, power_density.value,bs.value)
+            plot_data(n_rows.value, n_cols.value, change.new, L.value, k.value, C_p.value, rho.value, h.value, dt.value, T_inf.value, T_init.value, RS.value, power.value,bs.value)
      
 
     def file_change_L(change):
         output.clear_output(wait = True)
      
         with output:
-            plot_data(n_rows.value, n_cols.value, R.value, change.new, k.value, C_p.value, rho.value, h.value, dt.value, T_inf.value, T_init.value, RS.value, power_density.value,bs.value)
+            plot_data(n_rows.value, n_cols.value, R.value, change.new, k.value, C_p.value, rho.value, h.value, dt.value, T_inf.value, T_init.value, RS.value, power.value,bs.value)
      
 
     def file_change_n_rows(change):
         output.clear_output(wait = True)
      
         with output:
-            plot_data(change.new, n_cols.value, R.value, L.value, k.value, C_p.value, rho.value, h.value, dt.value, T_inf.value, T_init.value, RS.value, power_density.value,bs.value)
+            plot_data(change.new, n_cols.value, R.value, L.value, k.value, C_p.value, rho.value, h.value, dt.value, T_inf.value, T_init.value, RS.value, power.value,bs.value)
      
 
     def file_change_n_cols(change):
         output.clear_output(wait = True)
      
         with output:
-            plot_data(n_rows.value, change.new, R.value, L.value, k.value, C_p.value, rho.value, h.value, dt.value, T_inf.value, T_init.value, RS.value, power_density.value,bs.value)
+            plot_data(n_rows.value, change.new, R.value, L.value, k.value, C_p.value, rho.value, h.value, dt.value, T_inf.value, T_init.value, RS.value, power.value,bs.value)
      
 
     def file_change_k(change):
         output.clear_output(wait = True)
      
         with output:
-            plot_data(n_rows.value, n_cols.value, R.value, L.value, change.new, C_p.value, rho.value, h.value, dt.value, T_inf.value, T_init.value, RS.value, power_density.value,bs.value)
+            plot_data(n_rows.value, n_cols.value, R.value, L.value, change.new, C_p.value, rho.value, h.value, dt.value, T_inf.value, T_init.value, RS.value, power.value,bs.value)
      
 
     def file_change_C_p(change):
         output.clear_output(wait = True)
      
         with output:
-            plot_data(n_rows.value, n_cols.value, R.value, L.value, k.value, change.new, rho.value, h.value, dt.value, T_inf.value, T_init.value, RS.value, power_density.value,bs.value)
+            plot_data(n_rows.value, n_cols.value, R.value, L.value, k.value, change.new, rho.value, h.value, dt.value, T_inf.value, T_init.value, RS.value, power.value,bs.value)
      
 
     def file_change_rho(change):
         output.clear_output(wait = True)
      
         with output:
-            plot_data(n_rows.value, n_cols.value, R.value, L.value, k.value, C_p.value, change.new, h.value, dt.value, T_inf.value, T_init.value, RS.value, power_density.value,bs.value)
+            plot_data(n_rows.value, n_cols.value, R.value, L.value, k.value, C_p.value, change.new, h.value, dt.value, T_inf.value, T_init.value, RS.value, power.value,bs.value)
 
     def file_change_h(change):
         output.clear_output(wait = True)
      
         with output:
-            plot_data(n_rows.value, n_cols.value, R.value, L.value, k.value, C_p.value, rho.value, change.new, dt.value, T_inf.value, T_init.value, RS.value, power_density.value,bs.value)
+            plot_data(n_rows.value, n_cols.value, R.value, L.value, k.value, C_p.value, rho.value, change.new, dt.value, T_inf.value, T_init.value, RS.value, power.value,bs.value)
      
     def file_change_dt(change):
         output.clear_output(wait = True)
      
         with output:
-            plot_data(n_rows.value, n_cols.value, R.value, L.value, k.value, C_p.value, rho.value, h.value, change.new, T_inf.value, T_init.value, RS.value, power_density.value,bs.value)
+            plot_data(n_rows.value, n_cols.value, R.value, L.value, k.value, C_p.value, rho.value, h.value, change.new, T_inf.value, T_init.value, RS.value, power.value,bs.value)
      
     def file_change_T_inf(change):
         output.clear_output(wait = True)
      
         with output:
-            plot_data(n_rows.value, n_cols.value, R.value, L.value, k.value, C_p.value, rho.value, h.value, dt.value, change.new, T_init.value, RS.value, power_density.value,bs.value)
+            plot_data(n_rows.value, n_cols.value, R.value, L.value, k.value, C_p.value, rho.value, h.value, dt.value, change.new, T_init.value, RS.value, power.value,bs.value)
      
     def file_change_RS(change):
         output.clear_output(wait = True)
      
         with output:
-            plot_data(n_rows.value, n_cols.value, R.value, L.value, k.value, C_p.value, rho.value, h.value, dt.value, T_inf.value, T_init.value, change.new, power_density.value,bs.value)
+            plot_data(n_rows.value, n_cols.value, R.value, L.value, k.value, C_p.value, rho.value, h.value, dt.value, T_inf.value, T_init.value, change.new, power.value,bs.value)
     
-    def file_change_power_density(change):
+    def file_change_power(change):
         output.clear_output(wait = True)
      
         with output:
@@ -340,13 +340,13 @@ def T_model(folder=''):
         output.clear_output(wait = True)
      
         with output:
-            plot_data(n_rows.value, n_cols.value, R.value, L.value, k.value, C_p.value, rho.value, h.value, dt.value, T_inf.value, change.new, RS.value, power_density.value,bs.value)
+            plot_data(n_rows.value, n_cols.value, R.value, L.value, k.value, C_p.value, rho.value, h.value, dt.value, T_inf.value, change.new, RS.value, power.value,bs.value)
  
     def file_change_bs(change):
         output.clear_output(wait = True)
      
         with output:
-            plot_data(n_rows.value, n_cols.value, R.value, L.value, k.value, C_p.value, rho.value, h.value, dt.value, T_inf.value, T_init.value, RS.value, power_density.value,change.new)
+            plot_data(n_rows.value, n_cols.value, R.value, L.value, k.value, C_p.value, rho.value, h.value, dt.value, T_inf.value, T_init.value, RS.value, power.value,change.new)
          
 
 
@@ -362,7 +362,7 @@ def T_model(folder=''):
     RS.observe(file_change_RS, names = 'value') 
     T_inf.observe(file_change_T_inf, names = 'value')
     T_init.observe(file_change_T_init, names = 'value') 
-    power_density.observe(file_change_power_density, names = 'value') 
+    power.observe(file_change_power, names = 'value') 
     dt.observe(file_change_dt, names = 'value') 
     bs.observe(file_change_bs, names = 'value') 
     
